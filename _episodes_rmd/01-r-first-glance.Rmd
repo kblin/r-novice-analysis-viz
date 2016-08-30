@@ -1,0 +1,387 @@
+---
+title: "A brief introduction to R"
+teaching: 90
+exercises: 0
+questions:
+- "What is R and when should I use it?"
+- "How do I use the RStudio graphical user interface?"
+- "How do I assign variables?"
+- "How do I read tabular data into R?"
+- "What is a data frame?"
+- "How do I access subsets of a data frame?"
+- "How do I calculate simple statistics like mean and median?"
+- "Where can I get help?"
+- "How do I install a package?"
+- "How can I plot my data?"
+objectives:
+- "Get introduced to R and RStudio."
+- "Learn basic R syntax."
+- "Read tabular data from a file into R."
+- "Assign values to variables."
+- "Select individual values and subsections from data."
+- "Perform operations on a data frame of data."
+- "Be able to install a package from CRAN."
+- "Display simple graphs using ggplot2."
+keypoints:
+- "R is a strong statistical computing environment"
+- "Thousands of packages for R"
+- "Use `variable <- value` to assign a value to a variable in order to
+  record it in memory."
+- "Objects are created on demand whenever a value is assigned to them."
+- "Use `read.table` and `write.table` to import / export data."
+- "The function `str` describes the data frame."
+- "Use `object[x, y]` to select a single element from a data frame."
+- "Use `from:to` to specify a sequence that includes the indices from `from` to `to`."
+- "All the indexing and slicing that works on data frames also works on vectors."
+- "Use `#` to add comments to programs."
+- "Use `mean`, `max`, `min` and `sd` to calculate simple statistics."
+- "Use `tapply` to calculate statistics across the groups in a data frame."
+- "Use `ggplot` to create both simple and advanced visualizations."
+---
+
+
+```{r, include = FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("01-r-brief-introduction-")
+```
+## What is R?
+
+R is a statistical computing environment that has become a widely adopted standard for data analysis various fields - notably bioinformatics.
+
+- R is a dialect of the old (commercial) S language
+- R is relatively easy to learn to use - tons of built-in functions
+  that are just right for data analysis, focused on interactive use
+  and often very high-level
+- There are thousands of package implementing algorithms, procedures,
+  plots - for life science in particular
+- R is also a programming language. But not a great one.
+
+Consider using R to get access to packages that implement solution to a given problems like
+
+- differential gene expression analysis, gene set enrichment analysis,
+- metabolomics data analysis,
+- gene clustering,
+- access to online databases on gene expression / annotation etc,
+- qRT-PCR,
+- multivariate statistics, mixed linear models,
+- and much much more..
+
+*With Python, we have the framework to write great software for data analysis - with R, that software is, for better or worse, often already written*
+
+## RStudio - a graphical interface to R
+
+While R can be used directly in the shell, it is much nicer with a graphical interface. RStudio is by far the best one - let's learn how to use it.
+
+* Point to the different panels: Console, Scripts, Environments, Plots.
+* Code and workflow are more reproducible if we can document everything that we do.
+* Our end goal is not just to "do stuff" but to do it in a way that anyone can
+  easily and exactly replicate our workflow and results.
+* The best way to achieve this is to write scripts. RStudio provides an
+  environment that allows you to do that.
+
+### Interacting with R
+
+There are two main ways of interacting with R: using the console or by using
+script files (plain text files that contain your code).
+
+The console window (in RStudio, the bottom left panel) is the place where R is
+waiting for you to tell it what to do, and where it will show the results of a
+command.  You can type commands directly into the console, but they will be
+forgotten when you close the session. It is better to enter the commands in the
+script editor, and save the script. This way, you have a complete record of what
+you did, you can easily show others how you did it and you can do it again later
+on if needed. You can copy-paste into the R console, but the Rstudio script
+editor allows you to 'send' the current line or the currently selected text to
+the R console using the `Ctrl-Enter` shortcut.
+
+At some point in your analysis you may want to check the content of variable or
+the structure of an object, without necessarily keep a record of it in your
+script. You can type these commands directly in the console. RStudio provides
+the `Ctrl-1` and `Ctrl-2` shortcuts allow you to jump between the script and the
+console windows.
+
+If R is ready to accept commands, the R console shows a `>` prompt. If it
+receives a command (by typing, copy-pasting or sent from the script editor using
+`Ctrl-Enter`), R will try to execute it, and when ready, show the results and
+come back with a new `>`-prompt to wait for new commands.
+
+If R is still waiting for you to enter more data because it isn't complete yet,
+the console will show a `+` prompt. It means that you haven't finished entering
+a complete command. This is because you have not 'closed' a parenthesis or
+quotation. If you're in RStudio and this happens, click inside the console
+window and press `Esc`; this should help you out of trouble.
+
+## Basic R syntax
+### R as a calculator and variable assignment
+
+Just like with python, we can perform simple operations using the R console and assign the output to variables
+
+```{r}
+1 + 1
+```
+
+`<-` is the assignment operator. It assigns values on the right to objects on
+the left. So, after executing `x <- 3`, the value of `x` is `3`. The arrow can
+be read as 3 **goes into** `x`.  You can also use `=` for assignments but not in
+all contexts so it is good practice to use `<-` for assignments. `=` should only
+be used to specify the values of arguments in functions, see below.
+
+> ## Save some keystrokes..
+> In RStudio, typing `Alt + -` (push `Alt`, the key next to your space bar at the
+> same time as the `-` key) will write ` <- ` in a single keystroke.
+{: .callout}
+
+```{r}
+foo <- 1 + 1
+foo + 1
+```
+
+> ## Commenting
+>
+> We can add comments to our code using the `#` character. It is
+> useful to document our code in this way so that others (and us the
+> next time we read it) have an easier time following what the code is
+> doing.
+{: .callout}
+
+We can create some random numbers from the normal distribution and calculate the mean by using two built-in functions
+
+```{r}
+randomNumbers <- rnorm(10)
+mean(randomNumbers)
+```
+
+> ## All those built-ins..
+>
+> In contrast to Python, R has many functions available without
+> loading any extra packages (2383 to be exact). These are mostly
+> functions and becoming proficient with R is a lot about learning how
+> these work.
+{: .callout}
+
+### Getting help
+
+All R functions are documented and you can read about them using RStudio documentation pane, or typing `?object`, eg
+
+```{r, eval=FALSE}
+?mean
+```
+### R data types
+R has three main data types that we need to know about, the two main ones are `numeric` which is both integers and floats, `character`, and `factor` which is like integer but with a character label attached to number (or `level`). 
+
+```{r}
+is.numeric(1)
+is.character("foo")
+is.factor(factor(c("a", "b", "c", "c")))
+```
+
+There are numerous data structures and classes but mainly three we need to care about.
+
+**Vectors** Scalars act like vectors of length 1.
+```{r}
+foo <- c(1, 2, 3)
+foo[2]
+bar <- 1
+bar[1]
+```
+
+> ## Indexing starts at 1!
+>
+> Unlike python (and indeed most other programming languages) indexing starts at 1. `bar[0]` is however still syntactic correct, it just selects the null-vector from vector `bar` thus always a vector of length 0.
+{: .callout}
+
+**Matrices** work like one would expect, values in two dimensions. 
+
+```{r}
+(foo <- matrix(c(1, 2, 3, 4, 5, 6), nrow=2))
+```
+
+**Lists** are widely used and work like vectors except that each element can be any data structure - so you can have lists of matrices, lists of lists etc.
+
+```{r}
+(foo <- list(bar=c(1, 2, 3), baz=matrix(c(1, 2, 3, 4, 5, 6), nrow=2)))
+foo[[2]]
+foo$baz
+```
+
+Finally, **data frames** but they are so important they deserve a small section on their own.
+
+## Read data into R
+
+Now that we know how to assign things to variables and use functions, let's read some yeast OD growth data into R using `read.table` and briefly examine the dataset.
+ 
+
+```{r}
+growth <- read.table(file = "data/yeast-growth.csv", header = TRUE, sep = ",")
+```
+
+> ## Loading Data Without Headers
+>
+> What happens if you put `header = FALSE`? The default value is `header = TRUE`?. What do you expect will happen if you leave the default value? Before you run any code, think about what will happen to the first few rows of your data frame, and its overall size. Then run the following code and see if your expectations agree:
+>
+> ~~~
+> head(read.table(file = "data/yeast-growth.csv", header = FALSE, sep = ","))
+> ~~~
+> {: .r}
+{: .challenge}
+
+
+> ## Where is that file? Or, what is my working directory?
+>
+> R is always running inside a specific directory, the *working
+> directory*. Paths can be given relative to that directory so with
+> `data/yeast-growth.csv` we mean 'the file `yeast-growth.csv` in the
+> `data` directory that is right at the working directory. Set the
+> working directory using RStudio `Session` > `Set Working Directory..` or `setwd()`
+{: .callout}
+
+## Working with data frames
+
+Now that our data is loaded in memory, we can start doing things with it.
+First, let's ask what type of thing `growth` is:
+
+```{r}
+head(growth)
+str(growth) # what data types are the different columns?
+class(growth)
+```
+
+The output tells us that is a data frame. Think of this structure as a spreadsheet in MS Excel that many of us are familiar with.
+Data frames are very useful for storing data and you will find them elsewhere when programming in R. A typical data frame of experimental data contains individual observations in rows and variables in columns.
+
+We can see the shape, or [dimensions]({{ site.github.url }}/reference/#dimensions), of the data frame with the function `dim`:
+
+```{r}
+dim(growth)
+```
+
+This tells us that our data frame, `growth`, has `r nrow(growth)` rows and `r ncol(growth)` columns.
+
+If we want to get a single value from the data frame, we can provide an [index]({{ site.github.url }}/reference/#index) in square brackets, just as we do in math:
+
+```{r}
+ # first value in dat
+growth[1, 1]
+ # middle value in dat
+growth[30, 2]
+```
+
+An index like `[30, 2]` selects a single element of a data frame, but we can select whole sections as well.
+For example, we can select the first ten days (columns) of values for the first four patients (rows) like this:
+
+```{r}
+growth[1:4, 1:2]
+```
+
+The [slice]({{ site.github.url }}/reference/#slice) `1:4` means, "Values from 1 to 4."
+
+We can use the function `c`, which stands for **c**oncatenate, to select non-contiguous values:
+
+```{r}
+growth[c(3, 8, 37, 56), c(1, 3)]
+```
+
+We also don't have to provide a slice for either the rows or the columns.
+If we don't include a slice for the rows, R returns all the rows; if we don't include a slice for the columns, R returns all the columns.
+If we don't provide a slice for either rows or columns, e.g. `growth[, ]`, R returns the full data frame.
+
+```{r}
+growth[5, ]
+```
+
+> ## Addressing Columns by Name (the better way)
+>
+> Columns can also be addressed by name, with either the `$` operator (ie. `growth$medium`) or square brackets (ie. `growth[,"medium"]`).
+> You can learn more about subsetting by column name in this supplementary [lesson]({{ site.github.url }}/10-supp-addressing-data/).
+{: .callout}
+
+
+Particularly useful is also to user other vectors as filters and only return the rows that evaluate to `TRUE`. Here, `growth$strain == "strain-e"` gives a vector with `TRUE` or `FALSE` for every element in `growth$strain` that is equal to `"strain-e"`.
+
+```{r}
+head(growth[growth$strain == "strain-e",])
+```
+
+Now let's perform some common mathematical operations to learn about our growth curves.
+
+```{r}
+max(growth[growth$strain == "strain-e", "od"])
+```
+
+R also has functions for other common calculations, e.g. finding the minimum, mean, and standard deviation of the data:
+
+```{r}
+min(growth[growth$strain == "strain-e", "od"])
+mean(growth[growth$strain == "strain-e", "od"])
+sd(growth[growth$strain == "strain-e", "od"])
+```
+
+We may want to compare the different strains and for that we can use the split-apply approach which is very common in R. One (out of many) functions in R that implements this is `tapply`
+
+```{r}
+tapply(growth$od, growth$strain, max)
+```
+
+<img src="../fig/split-apply.svg" alt="the split apply approach, divide data to chunks, then run a given function on each ot the chunk sepearately" />
+
+There are many more `apply` style functions among which `lapply` for applying functions of to elements of lists, `apply` for applying functions to rows or columns of a matrix. 
+
+> ## Other forms of apply
+>
+> `split` is a function that can turn an array to a list based on another variable that indicates the groups, e.g. our 'strains'. Read a bit about `split` then use it together with `lapply` to achieve the same result as `tapply(growth$od, growth$strain, max)`
+{: .challenge}
+
+## Installing a package
+Next we will plot our data but since the default graphics system in R is quite cumbersome to use, and there is a very popular both easy to use and the same time very flexible package for making beautiful plots, we will use that instead - `ggplot2`. Since `ggplot2` isn't included with R by default, we first have to install it. 
+
+Install in RStudio by the menu system or type
+```{r, eval=FALSE} 
+install.packages("ggplot2")
+```
+
+This will also install a number of packages that `ggplot2` depends on. Once done, load the package from the library by
+
+```{r}
+library(ggplot2)
+```
+
+
+
+## Plotting our data
+
+`ggplot2` works well with data frames, particularly when formatted in the 'long' format that our growth data is already in. Plots are initialized with the `ggplot()` function and then we add layers to it to represent the data. Let's first make a simple scatter plot.
+
+```{r}
+ggplot(growth, aes(x=timepoint, y=od)) +
+    geom_point()
+```
+
+Let's add another layer, a line this time.
+
+```{r}
+ggplot(growth, aes(x=timepoint, y=od)) +
+    geom_point() +
+    geom_line()
+```
+
+Oops, that looks funny. Why? Because we haven't informed ggplot about the strains that each should make up a trajectory in our plot. We can do that by simply adding strain as another aesthetic. 
+
+```{r}
+ggplot(growth, aes(x=timepoint, y=od, color=strain)) +
+    geom_point() +
+    geom_line()
+```
+
+Plotting each line in separat facet would have been another option
+
+```{r}
+ggplot(growth, aes(x=timepoint, y=od)) +
+    geom_point() +
+    geom_line() +
+    facet_wrap(~strain)
+```
+
+`ggplot2` can present data in a large number of ways, explore the
+[online documentation](http://docs.ggplot2.org) or the
+[R graph gallery](http://www.r-graph-gallery.com/portfolio/ggplot2-package/)
+for inspiration.
