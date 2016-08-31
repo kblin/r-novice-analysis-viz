@@ -39,6 +39,16 @@ install.packages("locfit")
 ~~~
 {: .r}
 
+Then load the required packages.
+
+
+~~~
+library(edgeR)
+library(ggplot2)
+library(org.EcK12.eg.db)
+~~~
+{: .r}
+
 `edgeR` comes with very good user manual. You can access it by
 
 
@@ -132,29 +142,9 @@ We then create a `DGEList` which is a class used by `edgeR` and calculate normal
 ~~~
 wulffen <- DGEList(counts=wulffenTable, genes=rownames(wulffenTable),
                    samples=samples)
-~~~
-{: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): could not find function "DGEList"
-~~~
-{: .error}
-
-
-
-~~~
 wulffen <- calcNormFactors(wulffen)
 ~~~
 {: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): could not find function "calcNormFactors"
-~~~
-{: .error}
 
 ## Exploring the data
 
@@ -166,13 +156,6 @@ wulffenCpm <- cpm(wulffen)
 ~~~
 {: .r}
 
-
-
-~~~
-Error in eval(expr, envir, enclos): could not find function "cpm"
-~~~
-{: .error}
-
 Then we perform PCA using the built-in R function `prcomp`.
 
 
@@ -180,13 +163,6 @@ Then we perform PCA using the built-in R function `prcomp`.
 scores <- prcomp(log2(t(wulffenCpm) + 0.25))$x
 ~~~
 {: .r}
-
-
-
-~~~
-Error in t(wulffenCpm): object 'wulffenCpm' not found
-~~~
-{: .error}
 
 > ## What did the `t` do? Why `+ 0.25`?
 >
@@ -206,13 +182,6 @@ pcaDf <- merge(scores, samples, by=0)
 ~~~
 {: .r}
 
-
-
-~~~
-Error in merge(scores, samples, by = 0): object 'scores' not found
-~~~
-{: .error}
-
 Then we can plot the data using `ggplot2`
 
 
@@ -222,12 +191,7 @@ ggplot(pcaDf, aes(PC1, PC2, label=time, color=replicate)) +
 ~~~
 {: .r}
 
-
-
-~~~
-Error in ggplot(pcaDf, aes(PC1, PC2, label = time, color = replicate)): object 'pcaDf' not found
-~~~
-{: .error}
+<img src="../fig/rmd-03-explore-gene-expression-unnamed-chunk-11-1.png" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" style="display: block; margin: auto;" />
 
 The time-series can easily be recognized which is a good sign that experiment was successful.
 
@@ -240,47 +204,8 @@ With `edgeR` we will fit a simple generalized linear model to get estimates for 
 
 ~~~
 wulffenShort <- wulffen[, wulffen$samples$time %in% c("t0", "t10")]
-~~~
-{: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): object 'wulffen' not found
-~~~
-{: .error}
-
-
-
-~~~
 design <- model.matrix(~as.character(time), data=wulffenShort$samples)
-~~~
-{: .r}
-
-
-
-~~~
-Error in terms.formula(object, data = data): object 'wulffenShort' not found
-~~~
-{: .error}
-
-
-
-~~~
 colnames(design) <- c("(Intercept)", "t10")
-~~~
-{: .r}
-
-
-
-~~~
-Error in colnames(design) <- c("(Intercept)", "t10"): object 'design' not found
-~~~
-{: .error}
-
-
-
-~~~
 design
 ~~~
 {: .r}
@@ -288,56 +213,28 @@ design
 
 
 ~~~
-Error in eval(expr, envir, enclos): object 'design' not found
+           (Intercept) t10
+E14R012a01           1   0
+E14R012a06           1   1
+E14R012b01           1   0
+E14R012b06           1   1
+E14R012c01           1   0
+E14R012c06           1   1
+attr(,"assign")
+[1] 0 1
+attr(,"contrasts")
+attr(,"contrasts")$`as.character(time)`
+[1] "contr.treatment"
 ~~~
-{: .error}
+{: .output}
 
 The matrix we just created indicates which samples should be used to calculate the intercept (all samples) and then the effect of 10 min aeration (the t10 samples). With these objects we can now perform our differential expression analysis. 
 
 
 ~~~
 wulffenShort <- estimateDisp(wulffenShort, design)
-~~~
-{: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): could not find function "estimateDisp"
-~~~
-{: .error}
-
-
-
-~~~
 fit <- glmFit(wulffenShort, design)
-~~~
-{: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): could not find function "glmFit"
-~~~
-{: .error}
-
-
-
-~~~
 lrt <- glmLRT(fit)
-~~~
-{: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): could not find function "glmLRT"
-~~~
-{: .error}
-
-
-
-~~~
 topTags(lrt)
 ~~~
 {: .r}
@@ -345,9 +242,20 @@ topTags(lrt)
 
 
 ~~~
-Error in eval(expr, envir, enclos): could not find function "topTags"
+Coefficient:  t10 
+     genes    logFC   logCPM       LR        PValue           FDR
+1464   mqo 5.983158 8.274567 501.8363 3.788200e-111 1.636124e-107
+411   cyoA 7.245625 9.872659 457.2736 1.884543e-101  4.069670e-98
+2240  sodA 7.363860 9.419456 444.0240  1.441070e-98  2.074661e-95
+1735  phoH 5.249415 6.500320 409.3635  5.042966e-91  5.445142e-88
+413   cyoC 6.132766 8.098590 401.6896  2.361164e-89  2.039573e-86
+415   cyoE 5.368196 8.313842 400.1644  5.071640e-89  3.650736e-86
+1867  puuD 4.451530 6.908350 383.1221  2.601531e-85  1.605145e-82
+674   fhuF 6.378675 7.996506 374.5202  1.940986e-83  1.047890e-80
+1186  iscR 4.453203 9.513508 369.7437  2.128146e-82  1.021274e-79
+227   betT 4.818173 8.357982 361.3547  1.427579e-80  6.165712e-78
 ~~~
-{: .error}
+{: .output}
 
 What did we just do? The `estimateDisp` function is needed to estimate variance components robustly, `glmFit` fits the model we are after that essentially has one overall mean of expression and another mean for the t10 samples. glmLRT performes a log-likelihood ratio test against the null-hypothesis that t10 has the same average as all the samples together. Then with `topTags` we extract a table with the 10 most differentially expressed genes.
 
@@ -365,135 +273,6 @@ We want to examine if the top differentially expressed genes have any particular
 
 ~~~
 library(org.EcK12.eg.db)
-~~~
-{: .r}
-
-
-
-~~~
-Loading required package: methods
-~~~
-{: .output}
-
-
-
-~~~
-Loading required package: AnnotationDbi
-~~~
-{: .output}
-
-
-
-~~~
-Loading required package: stats4
-~~~
-{: .output}
-
-
-
-~~~
-Loading required package: BiocGenerics
-~~~
-{: .output}
-
-
-
-~~~
-Loading required package: parallel
-~~~
-{: .output}
-
-
-
-~~~
-
-Attaching package: 'BiocGenerics'
-~~~
-{: .output}
-
-
-
-~~~
-The following objects are masked from 'package:parallel':
-
-    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
-    clusterExport, clusterMap, parApply, parCapply, parLapply,
-    parLapplyLB, parRapply, parSapply, parSapplyLB
-~~~
-{: .output}
-
-
-
-~~~
-The following objects are masked from 'package:stats':
-
-    IQR, mad, xtabs
-~~~
-{: .output}
-
-
-
-~~~
-The following objects are masked from 'package:base':
-
-    anyDuplicated, append, as.data.frame, as.vector, cbind,
-    colnames, do.call, duplicated, eval, evalq, Filter, Find, get,
-    grep, grepl, intersect, is.unsorted, lapply, lengths, Map,
-    mapply, match, mget, order, paste, pmax, pmax.int, pmin,
-    pmin.int, Position, rank, rbind, Reduce, rownames, sapply,
-    setdiff, sort, table, tapply, union, unique, unlist, unsplit
-~~~
-{: .output}
-
-
-
-~~~
-Loading required package: Biobase
-~~~
-{: .output}
-
-
-
-~~~
-Welcome to Bioconductor
-
-    Vignettes contain introductory material; view with
-    'browseVignettes()'. To cite Bioconductor, see
-    'citation("Biobase")', and for packages 'citation("pkgname")'.
-~~~
-{: .output}
-
-
-
-~~~
-Loading required package: IRanges
-~~~
-{: .output}
-
-
-
-~~~
-Loading required package: S4Vectors
-~~~
-{: .output}
-
-
-
-~~~
-Loading required package: DBI
-~~~
-{: .output}
-
-
-
-~~~
-
-~~~
-{: .output}
-
-
-
-~~~
 symbol2entrez <- mapIds(org.EcK12.eg.db, rownames(lrt), "ENTREZID", keytype="SYMBOL")
 ~~~
 {: .r}
@@ -501,9 +280,9 @@ symbol2entrez <- mapIds(org.EcK12.eg.db, rownames(lrt), "ENTREZID", keytype="SYM
 
 
 ~~~
-Error in rownames(lrt): error in evaluating the argument 'x' in selecting a method for function 'rownames': Error: object 'lrt' not found
+'select()' returned 1:many mapping between keys and columns
 ~~~
-{: .error}
+{: .output}
 
 
 
@@ -512,88 +291,22 @@ universe <- na.omit(symbol2entrez)
 ~~~
 {: .r}
 
-
-
-~~~
-Error in na.omit(symbol2entrez): error in evaluating the argument 'object' in selecting a method for function 'na.omit': Error: object 'symbol2entrez' not found
-~~~
-{: .error}
-
 Then, we get a list of differentially expresssed genes, which we define as having a false discovery rate below 0.05. 
 
 
 ~~~
 fdr <- p.adjust(lrt$table[,"PValue"], "fdr")
-~~~
-{: .r}
-
-
-
-~~~
-Error in p.adjust(lrt$table[, "PValue"], "fdr"): object 'lrt' not found
-~~~
-{: .error}
-
-
-
-~~~
 allSymbols <- rownames(lrt$table)
-~~~
-{: .r}
-
-
-
-~~~
-Error in rownames(lrt$table): error in evaluating the argument 'x' in selecting a method for function 'rownames': Error: object 'lrt' not found
-~~~
-{: .error}
-
-
-
-~~~
 deSymbols <- allSymbols[fdr < 0.05 & !is.na(symbol2entrez)]
-~~~
-{: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): object 'allSymbols' not found
-~~~
-{: .error}
-
-
-
-~~~
 deEntrez <- symbol2entrez[deSymbols]
 ~~~
 {: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): object 'symbol2entrez' not found
-~~~
-{: .error}
 
 Then finally, we perform the GO over-representation analyis using `goana`. We define the species to enable `goana` figure out the mapping between Entrez identifiers go GO terms.
 
 
 ~~~
 goTable <- goana(deEntrez, universe=universe, species="EcK12")
-~~~
-{: .r}
-
-
-
-~~~
-Error in eval(expr, envir, enclos): could not find function "goana"
-~~~
-{: .error}
-
-
-
-~~~
 head(goTable[order(goTable$P.DE),])
 ~~~
 {: .r}
@@ -601,6 +314,19 @@ head(goTable[order(goTable$P.DE),])
 
 
 ~~~
-Error in head(goTable[order(goTable$P.DE), ]): error in evaluating the argument 'x' in selecting a method for function 'head': Error: object 'goTable' not found
+                                                          Term Ont   N  DE
+GO:0006091      generation of precursor metabolites and energy  BP 196 140
+GO:0015980 energy derivation by oxidation of organic compounds  BP 185 133
+GO:0045333                                cellular respiration  BP 168 121
+GO:0055114                         oxidation-reduction process  BP 213 140
+GO:0009061                               anaerobic respiration  BP 140 100
+GO:0009060                                 aerobic respiration  BP  65  55
+                   P.DE
+GO:0006091 2.367795e-45
+GO:0015980 1.912235e-43
+GO:0045333 2.009595e-39
+GO:0055114 1.290043e-38
+GO:0009061 8.139077e-32
+GO:0009060 6.101281e-24
 ~~~
-{: .error}
+{: .output}
