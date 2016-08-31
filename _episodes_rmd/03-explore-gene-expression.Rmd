@@ -40,6 +40,14 @@ biocLite(c("edgeR", "org.EcK12.eg.db"))
 install.packages("locfit")
 ```
 
+Then load the required packages.
+
+```{r, results="hide"}
+library(edgeR)
+library(ggplot2)
+library(org.EcK12.eg.db)
+```
+
 `edgeR` comes with very good user manual. You can access it by
 
 ```{r, eval=FALSE}
