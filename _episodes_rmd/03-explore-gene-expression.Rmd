@@ -154,6 +154,16 @@ What did we just do? The `estimateDisp` function is needed to estimate variance 
 > {: .r}
 {: .challenge}
 
+> ## Extra challenge: identifier mappings
+>
+> Use the `merge` function and the mapping to bnumbers in `data/ecoli.csv` to also add a column with bnumbers as identifiers
+> {: .r}
+{: .challenge}
+
+```{r, echo=FALSE, eval=FALSE}
+df <- merge(topTags(lrt, n=Inf), read.csv("data/ecoli.csv"))
+write.csv(df, file="data/deg.csv", quote=FALSE, row.names=FALSE)
+```
 
 ## Over-representation analysis of biological processes
 
@@ -174,9 +184,10 @@ deSymbols <- allSymbols[fdr < 0.05 & !is.na(symbol2entrez)]
 deEntrez <- symbol2entrez[deSymbols]
 ```
 
-Then finally, we perform the GO over-representation analyis using `goana`. We define the species to enable `goana` figure out the mapping between Entrez identifiers go GO terms.
+We perform the GO over-representation analyis using `goana`. We define the species to enable `goana` figure out the mapping between Entrez identifiers go GO terms.
 
 ```{r}
 goTable <- goana(deEntrez, universe=universe, species="EcK12")
 head(goTable[order(goTable$P.DE),])
 ```
+

@@ -44,10 +44,158 @@ Then load the required packages.
 
 ~~~
 library(edgeR)
+~~~
+{: .r}
+
+
+
+~~~
+Loading required package: limma
+~~~
+{: .output}
+
+
+
+~~~
 library(ggplot2)
 library(org.EcK12.eg.db)
 ~~~
 {: .r}
+
+
+
+~~~
+Loading required package: AnnotationDbi
+~~~
+{: .output}
+
+
+
+~~~
+Loading required package: stats4
+~~~
+{: .output}
+
+
+
+~~~
+Loading required package: BiocGenerics
+~~~
+{: .output}
+
+
+
+~~~
+Loading required package: parallel
+~~~
+{: .output}
+
+
+
+~~~
+
+Attaching package: 'BiocGenerics'
+~~~
+{: .output}
+
+
+
+~~~
+The following objects are masked from 'package:parallel':
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+~~~
+{: .output}
+
+
+
+~~~
+The following object is masked from 'package:limma':
+
+    plotMA
+~~~
+{: .output}
+
+
+
+~~~
+The following objects are masked from 'package:stats':
+
+    IQR, mad, xtabs
+~~~
+{: .output}
+
+
+
+~~~
+The following objects are masked from 'package:base':
+
+    Filter, Find, Map, Position, Reduce, anyDuplicated, append,
+    as.data.frame, cbind, colnames, do.call, duplicated, eval,
+    evalq, get, grep, grepl, intersect, is.unsorted, lapply,
+    lengths, mapply, match, mget, order, paste, pmax, pmax.int,
+    pmin, pmin.int, rank, rbind, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit
+~~~
+{: .output}
+
+
+
+~~~
+Loading required package: Biobase
+~~~
+{: .output}
+
+
+
+~~~
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+~~~
+{: .output}
+
+
+
+~~~
+Loading required package: IRanges
+~~~
+{: .output}
+
+
+
+~~~
+Loading required package: S4Vectors
+~~~
+{: .output}
+
+
+
+~~~
+
+Attaching package: 'S4Vectors'
+~~~
+{: .output}
+
+
+
+~~~
+The following objects are masked from 'package:base':
+
+    colMeans, colSums, expand.grid, rowMeans, rowSums
+~~~
+{: .output}
+
+
+
+~~~
+
+~~~
+{: .output}
 
 `edgeR` comes with very good user manual. You can access it by
 
@@ -265,6 +413,13 @@ What did we just do? The `estimateDisp` function is needed to estimate variance 
 > {: .r}
 {: .challenge}
 
+> ## Extra challenge: identifier mappings
+>
+> Use the `merge` function and the mapping to bnumbers in `data/ecoli.csv` to also add a column with bnumbers as identifiers
+> {: .r}
+{: .challenge}
+
+
 
 ## Over-representation analysis of biological processes
 
@@ -302,7 +457,7 @@ deEntrez <- symbol2entrez[deSymbols]
 ~~~
 {: .r}
 
-Then finally, we perform the GO over-representation analyis using `goana`. We define the species to enable `goana` figure out the mapping between Entrez identifiers go GO terms.
+We perform the GO over-representation analyis using `goana`. We define the species to enable `goana` figure out the mapping between Entrez identifiers go GO terms.
 
 
 ~~~
@@ -330,3 +485,4 @@ GO:0009061 8.139077e-32
 GO:0009060 6.101281e-24
 ~~~
 {: .output}
+
